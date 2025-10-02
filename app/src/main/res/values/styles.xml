@@ -1,0 +1,22 @@
+<resources>
+
+    <!-- Reusable text styles -->
+    <style name="TextHeadline">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextBody">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Material buttons (simple, Material3-safe) -->
+    <style name="ButtonPrimary" parent="Widget.Material3.Button">
+        <item name="android:layout_marginStart">8dp</item>
+    </style>
+
+    <style name="ButtonSecondary" parent="Widget.Material3.Button">
+        <item name="android:layout_marginStart">8dp</item>
+    </style>
+
+</resources>

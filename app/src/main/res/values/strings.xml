@@ -1,3 +1,29 @@
 <resources>
-    <string name="app_name">RentACarIntent</string>
+    <string name="app_name">Rent A Car Intent</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="search_hint">Search cars...</string>
+
+    <string name="balance">Balance: 500 cr</string>
+    <string name="name">Name</string>
+    <string name="model_year">Model • Year</string>
+    <string name="km">0 km</string>
+    <string name="cost">0 cr / day</string>
+
+    <string name="favorite">Favorite</string>
+    <string name="next">Next</string>
+    <string name="rent">Rent</string>
+    <string name="favorites">Favorites</string>
+
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+
+    <string name="added_to_favorites">Added to favourites</string>
+    <string name="booked">Booked!</string>
+    <string name="not_booked">Not booked</string>
+    <string name="err_limit_400">Each booking must be ≤ 400 credits.</string>
+    <string name="err_insufficient">Insufficient balance.</string>
+
+    <string name="sort_rating">Sort: Rating (high → low)</string>
+    <string name="sort_year">Sort: Year (newest → oldest)</string>
+    <string name="sort_cost">Sort: Cost (low → high)</string>
 </resources>
