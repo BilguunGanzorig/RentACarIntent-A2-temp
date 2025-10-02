@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_sort_rating"
+        android:title="@string/sort_rating" />
+    <item
+        android:id="@+id/action_sort_year"
+        android:title="@string/sort_year" />
+    <item
+        android:id="@+id/action_sort_cost"
+        android:title="@string/sort_cost" />
+</menu>

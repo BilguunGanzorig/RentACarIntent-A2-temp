@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="Theme.RentACarIntent" parent="android:Theme.Material.Light.NoActionBar" />
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.RentACarIntent" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:statusBarColor" tools:targetApi="21">@android:color/transparent</item>
+    </style>
 </resources>
