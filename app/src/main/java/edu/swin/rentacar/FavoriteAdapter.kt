@@ -33,6 +33,7 @@ class FavoriteAdapter(
 
     override fun getItemCount(): Int = items.size
 
+    /** Add if not already present. */
     fun addUnique(car: Car) {
         if (items.none { it.id == car.id }) {
             items.add(car)
@@ -40,6 +41,7 @@ class FavoriteAdapter(
         }
     }
 
+    /** Remove by object (if present). */
     fun remove(car: Car) {
         val idx = items.indexOfFirst { it.id == car.id }
         if (idx >= 0) {
@@ -47,4 +49,15 @@ class FavoriteAdapter(
             notifyItemRemoved(idx)
         }
     }
+
+    /** Remove by adapter position (used by swipe). */
+    fun removeAt(position: Int) {
+        if (position in 0 until items.size) {
+            items.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    /** Check if a car with this id is in favourites. */
+    fun contains(id: String): Boolean = items.any { it.id == id }
 }

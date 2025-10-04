@@ -4,15 +4,21 @@
     <string name="search_hint">Search cars...</string>
 
     <string name="balance">Balance: 500 cr</string>
+    <string name="balance_fmt">Balance: %1$d cr</string>
+
     <string name="name">Name</string>
     <string name="model_year">Model • Year</string>
     <string name="km">0 km</string>
+    <string name="km_fmt">%1$,d km</string>
+
     <string name="cost">0 cr / day</string>
+    <string name="cost_per_day_fmt">%1$d cr / day</string>
 
     <string name="favorite">Favorite</string>
     <string name="next">Next</string>
     <string name="rent">Rent</string>
     <string name="favorites">Favorites</string>
+    <string name="my_rentals">My Rentals</string>
 
     <string name="back">Back</string>
     <string name="save">Save</string>

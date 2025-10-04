@@ -50,10 +50,12 @@ class DetailActivity : AppCompatActivity() {
         tvTitle.text = "${car.name} ${car.model}"
         tvSubtitle.text = "${car.year}"
         rating.rating = car.rating
-        tvKm.text = "${car.kilometres} km"
-        tvDaily.text = "${car.dailyCost} cr / day"
-        tvDays.text = "1"
+        tvKm.text = getString(R.string.km_fmt, car.kilometres)
+        tvDaily.text = getString(R.string.cost_per_day_fmt, car.dailyCost)
 
+        // Ensure slider is 1..7 and label shows current
+        sliderDays.value = 1f
+        tvDays.text = sliderDays.value.toInt().toString()
         sliderDays.addOnChangeListener { _, value, _ ->
             tvDays.text = value.toInt().toString()
         }
@@ -68,7 +70,7 @@ class DetailActivity : AppCompatActivity() {
         }
 
         btnSave.setOnClickListener {
-            val days = tvDays.text.toString().toInt()
+            val days = sliderDays.value.toInt()
             val total = car.dailyCost * days
 
             if (total > perBookingLimit) {
@@ -87,5 +89,14 @@ class DetailActivity : AppCompatActivity() {
             })
             finish()
         }
+    }
+
+    override fun onBackPressed() {
+        setResult(RESULT_OK, Intent().apply {
+            putExtra(MainActivity.EXTRA_CAR, car)
+            putExtra(MainActivity.EXTRA_DAYS, 1)
+            putExtra(MainActivity.EXTRA_RENTED, false)
+        })
+        finish()
     }
 }

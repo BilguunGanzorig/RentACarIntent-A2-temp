@@ -7,12 +7,14 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.materialswitch.MaterialSwitch
 import edu.swin.rentacar.data.CarRepository
 import edu.swin.rentacar.model.Car
+import edu.swin.rentacar.model.Rental
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +35,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var rvFavorites: RecyclerView
     private lateinit var favAdapter: FavoriteAdapter
+
+    private lateinit var rvRentals: RecyclerView
+    private lateinit var rentedAdapter: RentedAdapter
+    private val rentals = mutableListOf<Rental>()
 
     private var currentIndex = 0
     private var visibleCars: MutableList<Car> = CarRepository.cars.toMutableList()
@@ -67,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         btnNext = findViewById(R.id.btnNext)
         btnRent = findViewById(R.id.btnRent)
 
+        // Favourites
         rvFavorites = findViewById(R.id.rvFavorites)
         favAdapter = FavoriteAdapter(mutableListOf()) { car ->
             val pos = visibleCars.indexOfFirst { it.id == car.id }
@@ -75,12 +82,49 @@ class MainActivity : AppCompatActivity() {
                 showCar(visibleCars[currentIndex])
             }
         }
-        rvFavorites.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rvFavorites.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvFavorites.adapter = favAdapter
 
-        tvBalance.text = getString(R.string.balance)
+        // My Rentals
+        rvRentals = findViewById(R.id.rvRentals)
+        rvRentals.layoutManager = LinearLayoutManager(this)
+        rentedAdapter = RentedAdapter(rentals)
+        rvRentals.adapter = rentedAdapter
+
+        // Swipe to remove from My Rentals (history clean-up only)
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                rv: RecyclerView, vh: RecyclerView.ViewHolder, tgt: RecyclerView.ViewHolder
+            ) = false
+
+            override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
+                val pos = vh.adapterPosition
+                rentedAdapter.removeAt(pos)
+                Toast.makeText(this@MainActivity, "Removed from My Rentals", Toast.LENGTH_SHORT).show()
+            }
+        }).attachToRecyclerView(rvRentals)
+
+        // Swipe to remove from Favorites
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                rv: RecyclerView, vh: RecyclerView.ViewHolder, tgt: RecyclerView.ViewHolder
+            ) = false
+
+            override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
+                val pos = vh.adapterPosition
+                favAdapter.removeAt(pos)
+                Toast.makeText(this@MainActivity, "Removed from favourites", Toast.LENGTH_SHORT).show()
+            }
+        }).attachToRecyclerView(rvFavorites)
+
+        refreshBalance()
+
         if (visibleCars.isNotEmpty()) showCar(visibleCars[currentIndex]) else clearCard()
+        updateButtonsEnabled()
 
         // Search by name/model
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -96,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 currentIndex = 0
                 if (visibleCars.isNotEmpty()) showCar(visibleCars[currentIndex]) else clearCard()
+                updateButtonsEnabled()
                 return true
             }
         })
@@ -115,11 +160,17 @@ class MainActivity : AppCompatActivity() {
             showCar(visibleCars[currentIndex])
         }
 
+        // ❤️ Heart now toggles favourites (add/remove)
         btnFavorite.setOnClickListener {
             if (visibleCars.isEmpty()) return@setOnClickListener
             val car = visibleCars[currentIndex]
-            favAdapter.addUnique(car)
-            Toast.makeText(this, getString(R.string.added_to_favorites), Toast.LENGTH_SHORT).show()
+            if (favAdapter.contains(car.id)) {
+                favAdapter.remove(car)
+                Toast.makeText(this, "Removed from favourites", Toast.LENGTH_SHORT).show()
+            } else {
+                favAdapter.addUnique(car)
+                Toast.makeText(this, getString(R.string.added_to_favorites), Toast.LENGTH_SHORT).show()
+            }
         }
 
         btnRent.setOnClickListener {
@@ -132,17 +183,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun refreshBalance() {
+        tvBalance.text = getString(R.string.balance_fmt, creditBalance)
+    }
+
+    private fun formatKm(km: Int) = getString(R.string.km_fmt, km)
+
     private fun showCar(car: Car) {
         imgCar.setImageResource(car.imageRes)
+        imgCar.contentDescription = "${car.name} ${car.model} ${car.year}"
         tvName.text = car.name
         tvModelYear.text = "${car.model} • ${car.year}"
         ratingBar.rating = car.rating
-        tvKm.text = "${car.kilometres} km"
-        tvCost.text = "${car.dailyCost} cr / day"
+        tvKm.text = formatKm(car.kilometres)
+        tvCost.text = getString(R.string.cost_per_day_fmt, car.dailyCost)
     }
 
     private fun clearCard() {
         imgCar.setImageResource(R.drawable.car_placeholder)
+        imgCar.contentDescription = null
         tvName.text = ""
         tvModelYear.text = ""
         ratingBar.rating = 0f
@@ -150,7 +209,13 @@ class MainActivity : AppCompatActivity() {
         tvCost.text = ""
     }
 
-    // ---- Sort menu ----
+    private fun updateButtonsEnabled() {
+        val enabled = visibleCars.isNotEmpty()
+        btnRent.isEnabled = enabled
+        btnNext.isEnabled = enabled
+        btnFavorite.isEnabled = enabled
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -165,9 +230,11 @@ class MainActivity : AppCompatActivity() {
         }
         currentIndex = 0
         if (visibleCars.isNotEmpty()) showCar(visibleCars[currentIndex]) else clearCard()
+        updateButtonsEnabled()
         return true
     }
 
+    @Deprecated("Using legacy result API for simplicity; optional to migrate to Activity Result API")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQ_DETAIL && resultCode == RESULT_OK && data != null) {
@@ -176,23 +243,26 @@ class MainActivity : AppCompatActivity() {
             val car = data.getParcelableExtra<Car>(EXTRA_CAR) ?: return
 
             if (rented) {
-                creditBalance -= (car.dailyCost * days)
+                val total = car.dailyCost * days
+                creditBalance -= total
                 Toast.makeText(this, getString(R.string.booked), Toast.LENGTH_SHORT).show()
 
-                val idxRepo = CarRepository.cars.indexOfFirst { it.id == car.id }
-                if (idxRepo >= 0) CarRepository.cars.removeAt(idxRepo)
+                // Remove from lists of available cars
+                CarRepository.cars.removeAll { it.id == car.id }
+                visibleCars.removeAll { it.id == car.id }
+                favAdapter.remove(car) // also stop showing in favourites
 
-                val idxVisible = visibleCars.indexOfFirst { it.id == car.id }
-                if (idxVisible >= 0) {
-                    visibleCars.removeAt(idxVisible)
-                    if (visibleCars.isNotEmpty()) {
-                        currentIndex %= visibleCars.size
-                        showCar(visibleCars[currentIndex])
-                    } else {
-                        clearCard()
-                    }
+                // Add to My Rentals history
+                rentedAdapter.add(Rental(car, days, total))
+
+                if (visibleCars.isNotEmpty()) {
+                    currentIndex %= visibleCars.size
+                    showCar(visibleCars[currentIndex])
+                } else {
+                    clearCard()
                 }
-                tvBalance.text = "Balance: ${creditBalance} cr"
+                refreshBalance()
+                updateButtonsEnabled()
             } else {
                 Toast.makeText(this, getString(R.string.not_booked), Toast.LENGTH_SHORT).show()
             }
