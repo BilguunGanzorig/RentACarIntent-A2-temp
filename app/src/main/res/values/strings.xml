@@ -32,4 +32,6 @@
     <string name="sort_rating">Sort: Rating (high → low)</string>
     <string name="sort_year">Sort: Year (newest → oldest)</string>
     <string name="sort_cost">Sort: Cost (low → high)</string>
+    <string name="refunded_fmt">Booking cancelled. %1$d cr refunded.</string>
+
 </resources>

@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         rentedAdapter = RentedAdapter(rentals)
         rvRentals.adapter = rentedAdapter
 
-        // Swipe to remove from My Rentals (history clean-up only)
+        // Swipe to remove from My Rentals WITH REFUND
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
@@ -101,12 +101,42 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
                 val pos = vh.adapterPosition
+
+                // Read the rental first (so we know refund amount), then remove
+                val rental = rentedAdapter.itemAt(pos)
                 rentedAdapter.removeAt(pos)
-                Toast.makeText(this@MainActivity, "Removed from My Rentals", Toast.LENGTH_SHORT).show()
+
+                if (rental != null) {
+                    val car = rental.car
+                    val refund = rental.totalCost
+
+                    // Refund credits
+                    creditBalance += refund
+                    refreshBalance()
+
+                    // Re-add the car to available + visible list (avoid duplicates)
+                    if (CarRepository.cars.none { it.id == car.id }) {
+                        CarRepository.cars.add(0, car)
+                    }
+                    if (visibleCars.none { it.id == car.id }) {
+                        visibleCars.add(0, car)
+                    }
+
+                    // Show the re-added car immediately
+                    currentIndex = 0
+                    showCar(visibleCars[currentIndex])
+                    updateButtonsEnabled()
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.refunded_fmt, refund),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }).attachToRecyclerView(rvRentals)
 
-        // Swipe to remove from Favorites
+        // Swipe to remove from Favorites (no credit changes)
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
@@ -160,7 +190,7 @@ class MainActivity : AppCompatActivity() {
             showCar(visibleCars[currentIndex])
         }
 
-        // ❤️ Heart now toggles favourites (add/remove)
+        // Heart toggles favourites (add/remove)
         btnFavorite.setOnClickListener {
             if (visibleCars.isEmpty()) return@setOnClickListener
             val car = visibleCars[currentIndex]
@@ -247,12 +277,12 @@ class MainActivity : AppCompatActivity() {
                 creditBalance -= total
                 Toast.makeText(this, getString(R.string.booked), Toast.LENGTH_SHORT).show()
 
-                // Remove from lists of available cars
+                // Remove from available/visible and favourites
                 CarRepository.cars.removeAll { it.id == car.id }
                 visibleCars.removeAll { it.id == car.id }
-                favAdapter.remove(car) // also stop showing in favourites
+                favAdapter.remove(car)
 
-                // Add to My Rentals history
+                // Track rental & show in "My Rentals"
                 rentedAdapter.add(Rental(car, days, total))
 
                 if (visibleCars.isNotEmpty()) {

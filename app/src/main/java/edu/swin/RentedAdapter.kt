@@ -40,11 +40,16 @@ class RentedAdapter(
         notifyItemInserted(0)
     }
 
-    /** Remove by adapter position (used by swipe). */
-    fun removeAt(position: Int) {
-        if (position in 0 until items.size) {
-            items.removeAt(position)
+    /** Read without removing (use before swipe removal). */
+    fun itemAt(position: Int): Rental? =
+        if (position in 0 until items.size) items[position] else null
+
+    /** Remove by adapter position (returns removed Rental if present). */
+    fun removeAt(position: Int): Rental? {
+        return if (position in 0 until items.size) {
+            val removed = items.removeAt(position)
             notifyItemRemoved(position)
-        }
+            removed
+        } else null
     }
 }
