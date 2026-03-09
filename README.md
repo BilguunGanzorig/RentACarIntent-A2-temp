@@ -1,6 +1,6 @@
 # RentACarIntent-A2-temp
 
-# 🚗 Rent A Car Intent – Assignment 2 (COS30017 Mobile Development)
+#  Rent A Car Intent – Assignment 2 (COS30017 Mobile Development)
 
 This project is a **two-activity Android app** built using **Kotlin** and **Android Studio**.  
 It demonstrates the use of **Intents**, **Parcelable data transfer**, **multi-screen UI design**, and **Material Design components** for a car rental system.
@@ -16,7 +16,7 @@ It demonstrates the use of **Intents**, **Parcelable data transfer**, **multi-sc
 
 ---
 
-## 🎯 Objectives
+## Objectives
 
 This assignment demonstrates the ability to:
 - Build a **multi-activity Android app** with Intents and Parcelable.
@@ -28,9 +28,9 @@ This assignment demonstrates the ability to:
 
 ---
 
-## ⚙️ Features
+##  Features
 
-### 🧩 Functional
+###  Functional
 - Display **five cars** with name, model, year, rating, kilometres, and daily cost.
 - **Next** button cycles through cars.
 - **Rent** button launches a detail activity using a `Parcelable` intent.
@@ -43,7 +43,7 @@ This assignment demonstrates the ability to:
 - **Dark mode toggle** – instantly switches theme across both activities.
 - **Toasts** notify user actions (added, booked, cancelled, removed).
 
-### 🧰 Technical
+###  Technical
 - Kotlin with `Parcelable` data model.
 - Two activities (`MainActivity`, `DetailActivity`).
 - Custom adapters (`FavoriteAdapter`, `RentedAdapter`).
@@ -52,7 +52,7 @@ This assignment demonstrates the ability to:
 
 ---
 
-## 🧠 Architecture
+##  Architecture
 
 edu.swin.rentacar
 ├── data/
@@ -72,7 +72,7 @@ edu.swin.rentacar
 
 ---
 
-## 🧑‍💻 How It Works
+##  How It Works
 
 1. The main screen lists one car at a time with **Next**, **Rent**, and **Favorite** buttons.  
 2. Clicking **Rent** opens the **DetailActivity** using a `Parcelable` `Car` object.  
@@ -86,7 +86,7 @@ edu.swin.rentacar
 
 ---
 
-## 🧪 Testing & Validation
+##  Testing & Validation
 
 | Test Case | Expected Outcome |
 |------------|------------------|
